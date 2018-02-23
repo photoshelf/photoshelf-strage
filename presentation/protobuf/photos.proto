@@ -1,11 +1,32 @@
 syntax = "proto3";
 
+import "google/api/annotations.proto";
+
 package protobuf;
 
 service PhotoService {
-    rpc Save (Photo) returns (Id);
-    rpc Find (Id) returns (Photo);
-    rpc Delete (Id) returns (Empty);
+    rpc Create (Photo) returns (Id) {
+        option (google.api.http) = {
+            post: "/api/v1/photos"
+            body: "*"
+        };
+    };
+    rpc Update (Photo) returns (Empty) {
+        option (google.api.http) = {
+            put: "/api/v1/photos/{id.value}"
+            body: "*"
+        };
+    };
+    rpc Read (Id) returns (Photo) {
+        option (google.api.http) = {
+            get: "/api/v1/photos/{value}"
+        };
+    };
+    rpc Delete (Id) returns (Empty) {
+        option (google.api.http) = {
+            delete: "/api/v1/photos/{value}"
+        };
+    };
 }
 
 message Id {

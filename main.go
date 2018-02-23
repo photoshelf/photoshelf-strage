@@ -3,9 +3,9 @@ package main
 import (
 	"fmt"
 	"github.com/photoshelf/photoshelf-storage/application"
-	"github.com/photoshelf/photoshelf-storage/presentation/router"
+	"github.com/photoshelf/photoshelf-storage/infrastructure/server"
 	"log"
-	"net"
+	"net/http"
 	"os"
 )
 
@@ -16,29 +16,26 @@ func main() {
 		os.Exit(-1)
 	}
 
-	address := fmt.Sprintf(":%d", conf.Server.Port)
+	httpAddress := fmt.Sprintf(":%d", conf.Server.Port)
+	grpcAddress := fmt.Sprintf(":%d", conf.Gateway.Port)
 
-	switch conf.Server.Mode {
-	case "rest":
-		e, err := router.LoadEchoServer()
-		if err != nil {
+	gw, err := server.NewGateway(grpcAddress)
+	if err != nil {
+		log.Fatal(err)
+		os.Exit(-1)
+	}
+	go func() {
+		if err := http.ListenAndServe(httpAddress, gw); err != nil {
 			log.Fatal(err)
 			os.Exit(-1)
 		}
-		e.Logger.Info(e.Start(address))
+	}()
 
-	case "grpc":
-		s := router.LoadGrpcServer()
+	s := server.NewServer()
+	defer s.GracefulStop()
 
-		listener, err := net.Listen("tcp", address)
-		if err != nil {
-			log.Fatal(err)
-			os.Exit(-1)
-		}
-		s.Serve(listener)
-
-	default:
-		log.Fatalf("No such as server mode: %s", conf.Server.Mode)
+	if err := http.ListenAndServe(httpAddress, s); err != nil {
+		log.Fatal(err)
 		os.Exit(-1)
 	}
 }
