@@ -20,8 +20,10 @@ func NewServer() *grpc.Server {
 }
 
 func NewGateway(endpoint string) (*runtime.ServeMux, error) {
+	ctx := context.Background()
 	mux := runtime.NewServeMux()
-	if err := protobuf.RegisterPhotoServiceHandlerFromEndpoint(context.Background(), mux, endpoint, []grpc.DialOption{}); err != nil {
+	opts := []grpc.DialOption{grpc.WithInsecure()}
+	if err := protobuf.RegisterPhotoServiceHandlerFromEndpoint(ctx, mux, endpoint, opts); err != nil {
 		return nil, err
 	}
 
