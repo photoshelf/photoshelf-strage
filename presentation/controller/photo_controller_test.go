@@ -121,6 +121,12 @@ func TestGrpcPhotoControllerImpl_Update(t *testing.T) {
 		_, err := photoController.Update(context.Background(), &protobuf.Photo{Id: &protobuf.Id{}})
 		assert.Error(t, err)
 	})
+
+	t.Run("when id is null, returns error", func(t *testing.T) {
+		photoController := NewPhotoController()
+		_, err := photoController.Update(context.Background(), &protobuf.Photo{})
+		assert.Error(t, err)
+	})
 }
 
 func TestGrpcPhotoController_Delete(t *testing.T) {
