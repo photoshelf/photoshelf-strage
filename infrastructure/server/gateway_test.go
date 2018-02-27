@@ -106,7 +106,7 @@ func TestGateway(t *testing.T) {
 		actual := res.Value
 		expected := "test_id"
 
-		assert.Equal(t, 200, rec.Result().StatusCode)
+		assert.Equal(t, 201, rec.Result().StatusCode)
 		assert.Equal(t, expected, actual)
 	})
 

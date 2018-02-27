@@ -29,6 +29,20 @@ func forwardReadResp(
 	w.Write([]byte(photo.Image))
 }
 
+func forwardCreateResp(
+	ctx context.Context,
+	mux *runtime.ServeMux,
+	marshaler runtime.Marshaler,
+	w http.ResponseWriter,
+	req *http.Request,
+	resp proto.Message,
+	opts ...func(context.Context, http.ResponseWriter, proto.Message) error,
+) {
+	w.WriteHeader(201)
+	runtime.ForwardResponseMessage(ctx, mux, marshaler, w, req, resp, opts...)
+}
+
 func init() {
 	forward_PhotoService_Read_0 = forwardReadResp
+	forward_PhotoService_Create_0 = forwardCreateResp
 }
