@@ -53,10 +53,7 @@ func TestGateway(t *testing.T) {
 
 		gw.ServeHTTP(rec, req)
 
-		res := &protobuf.Photo{}
-		jsonpb.Unmarshal(rec.Body, res)
-
-		actual := res.Image
+		actual := rec.Body.Bytes()
 		expected := []byte("Hello World.")
 
 		assert.Equal(t, 200, rec.Result().StatusCode)
