@@ -35,7 +35,8 @@ go get -u github.com/photoshelf/photoshelf-storage
 |flag|description            |default |
 |----|-----------------------|--------|
 |c   |configuration file path|        |
-|p   |port number            |1323    |
+|p   |gateway port number    |1323    |
+|g   |grpc port number       |1324    |
 |t   |storage type           |boltdb  |
 |s   |storage path           |./photos|
 
@@ -91,6 +92,17 @@ curl -X PUT http://localhost:1323/photos/:id -F "photo=@/path/to/new_photo"
 ### Delete
 ```bash
 curl -X DELETE http://localhost:1323/photos/:id
+```
+
+## Development
+## Generate interface and gateway code from protobuf
+```bash
+protoc -I $GOPATH/src/github.com/google/protobuf/src \
+       -I $GOPATH/src/github.com/grpc-ecosystem/grpc-gateway/third_party/googleapis \
+       -I presentation/protobuf \
+       --go_out=plugins=grpc:presentation/protobuf \
+       --grpc-gateway_out=logtostderr=true:presentation/protobuf \
+       presentation/protobuf/photos.proto
 ```
 
 ## License
