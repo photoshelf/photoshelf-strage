@@ -50,9 +50,5 @@ required = [
   version = "1.2.0"
 
 [[constraint]]
-  branch = "master"
-  name = "github.com/syndtr/goleveldb"
-
-[[constraint]]
   branch = "v2"
   name = "gopkg.in/yaml.v2"
