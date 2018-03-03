@@ -1,20 +1,18 @@
 package server
 
 import (
+	"bytes"
 	"errors"
 	"github.com/golang/mock/gomock"
 	"github.com/golang/protobuf/jsonpb"
 	"github.com/photoshelf/photoshelf-storage/presentation/protobuf"
 	"github.com/stretchr/testify/assert"
 	"google.golang.org/grpc"
+	"mime/multipart"
 	"net"
 	"net/http/httptest"
 	"strings"
 	"testing"
-	"bytes"
-	"mime/multipart"
-	"os"
-	"io"
 )
 
 func TestGateway(t *testing.T) {
@@ -98,22 +96,15 @@ func TestGateway(t *testing.T) {
 			defer s.Stop()
 		}()
 
-
 		var b bytes.Buffer
 		w := multipart.NewWriter(&b)
 
-		file, err := os.Open("../../testdata/e3158990bdee63f8594c260cd51a011d")
-		if err != nil {
-			t.Fatal(err)
-		}
-		defer file.Close()
-
-		fw, err := w.CreateFormFile("photo", "hoge")
+		fw, err := w.CreateFormFile("photo", "file-name")
 		if err != nil {
 			t.Fatal(err)
 		}
 
-		if _, err = io.Copy(fw, file); err != nil {
+		if _, err = fw.Write([]byte("Hello World.")); err != nil {
 			t.Fatal(err)
 		}
 		w.Close()
@@ -125,14 +116,14 @@ func TestGateway(t *testing.T) {
 
 		gw.ServeHTTP(rec, req)
 
-		//res := &protobuf.Id{}
-		//jsonpb.Unmarshal(rec.Body, res)
-		//
-		//actual := res
-		//expected := "test_id"
+		res := &protobuf.Id{}
+		jsonpb.Unmarshal(rec.Body, res)
+
+		actual := res.Value
+		expected := "test_id"
 
 		assert.Equal(t, 201, rec.Result().StatusCode)
-		//assert.Equal(t, expected, actual)
+		assert.Equal(t, expected, actual)
 	})
 
 	t.Run("PUT /api/v1/photos/identifier", func(t *testing.T) {
@@ -166,7 +157,7 @@ func TestGateway(t *testing.T) {
 			defer s.Stop()
 		}()
 
-		reqBody := "{\"id\":{\"value\":\"identifier\"},\"image\":\"SGVsbG8gV29ybGQu\"}"
+		reqBody := "{\"image\":\"SGVsbG8gV29ybGQu\"}"
 		req := httptest.NewRequest("PUT", "/api/v1/photos/identifier", strings.NewReader(reqBody))
 		rec := httptest.NewRecorder()
 
