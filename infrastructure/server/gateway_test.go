@@ -2,6 +2,7 @@ package server
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
 	"github.com/golang/mock/gomock"
 	"github.com/golang/protobuf/jsonpb"
@@ -116,10 +117,10 @@ func TestGateway(t *testing.T) {
 
 		gw.ServeHTTP(rec, req)
 
-		res := &protobuf.Id{}
-		jsonpb.Unmarshal(rec.Body, res)
+		var res map[string]string
+		json.Unmarshal(rec.Body.Bytes(), &res)
 
-		actual := res.Value
+		actual := res["id"]
 		expected := "test_id"
 
 		assert.Equal(t, 201, rec.Result().StatusCode)

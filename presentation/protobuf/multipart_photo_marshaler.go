@@ -2,6 +2,7 @@ package protobuf
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
@@ -16,12 +17,12 @@ type MultipartPhotoMarshaler struct {
 }
 
 func (*MultipartPhotoMarshaler) Marshal(v interface{}) ([]byte, error) {
-	photo, err := toPhoto(v)
-	if err != nil {
-		return nil, err
+	id, ok := v.(*Id)
+	if !ok {
+		return nil, errors.New("photoshelf: error")
 	}
 
-	return photo.Image, nil
+	return json.Marshal(map[string]string{"id": id.Value})
 }
 
 func (*MultipartPhotoMarshaler) Unmarshal(data []byte, v interface{}) error {
@@ -95,15 +96,7 @@ type PhotoEncoder struct {
 }
 
 func (encoder *PhotoEncoder) Encode(v interface{}) error {
-	photo, ok := v.(*Photo)
-	if !ok {
-		return errors.New("(´;ω;｀)")
-	}
-	if _, err := encoder.w.Write(photo.Image); err != nil {
-		return err
-	}
-
-	return nil
+	return errors.New("photoshelf: not implement yet")
 }
 
 func messageBoundary(data []byte) (string, error) {
