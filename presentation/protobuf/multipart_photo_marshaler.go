@@ -12,9 +12,10 @@ import (
 	"regexp"
 )
 
-type CustomMarshaler struct{}
+type MultipartPhotoMarshaler struct {
+}
 
-func (c *CustomMarshaler) Marshal(v interface{}) ([]byte, error) {
+func (*MultipartPhotoMarshaler) Marshal(v interface{}) ([]byte, error) {
 	photo, err := toPhoto(v)
 	if err != nil {
 		return nil, err
@@ -23,7 +24,7 @@ func (c *CustomMarshaler) Marshal(v interface{}) ([]byte, error) {
 	return photo.Image, nil
 }
 
-func (c *CustomMarshaler) Unmarshal(data []byte, v interface{}) error {
+func (*MultipartPhotoMarshaler) Unmarshal(data []byte, v interface{}) error {
 	photo, err := toPhoto(v)
 	if err != nil {
 		return err
@@ -33,15 +34,15 @@ func (c *CustomMarshaler) Unmarshal(data []byte, v interface{}) error {
 	return nil
 }
 
-func (c *CustomMarshaler) NewDecoder(r io.Reader) runtime.Decoder {
+func (*MultipartPhotoMarshaler) NewDecoder(r io.Reader) runtime.Decoder {
 	return &PhotoDecoder{r}
 }
 
-func (c *CustomMarshaler) NewEncoder(w io.Writer) runtime.Encoder {
+func (*MultipartPhotoMarshaler) NewEncoder(w io.Writer) runtime.Encoder {
 	return &PhotoEncoder{w}
 }
 
-func (c *CustomMarshaler) ContentType() string {
+func (*MultipartPhotoMarshaler) ContentType() string {
 	return "multipart/form-data"
 }
 
