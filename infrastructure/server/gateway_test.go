@@ -12,7 +12,6 @@ import (
 	"mime/multipart"
 	"net"
 	"net/http/httptest"
-	"strings"
 	"testing"
 )
 
@@ -158,9 +157,23 @@ func TestGateway(t *testing.T) {
 			defer s.Stop()
 		}()
 
-		reqBody := "{\"image\":\"SGVsbG8gV29ybGQu\"}"
-		req := httptest.NewRequest("PUT", "/api/v1/photos/identifier", strings.NewReader(reqBody))
+		var b bytes.Buffer
+		w := multipart.NewWriter(&b)
+
+		fw, err := w.CreateFormFile("photo", "file-name")
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		if _, err = fw.Write([]byte("Hello World.")); err != nil {
+			t.Fatal(err)
+		}
+		w.Close()
+
+		req := httptest.NewRequest("PUT", "/api/v1/photos/identifier", &b)
 		rec := httptest.NewRecorder()
+
+		req.Header.Add("Content-Type", "multipart/form-data")
 
 		gw.ServeHTTP(rec, req)
 

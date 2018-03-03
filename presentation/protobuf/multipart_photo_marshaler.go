@@ -17,12 +17,15 @@ type MultipartPhotoMarshaler struct {
 }
 
 func (*MultipartPhotoMarshaler) Marshal(v interface{}) ([]byte, error) {
-	id, ok := v.(*Id)
-	if !ok {
-		return nil, errors.New("photoshelf: error")
+	switch v.(type) {
+	case *Id:
+		id, _ := v.(*Id)
+		return json.Marshal(map[string]string{"id": id.Value})
+	case *Empty:
+		return nil, nil
+	default:
+		return nil, fmt.Errorf("photoshelf: wrong type %s", reflect.TypeOf(v))
 	}
-
-	return json.Marshal(map[string]string{"id": id.Value})
 }
 
 func (*MultipartPhotoMarshaler) Unmarshal(data []byte, v interface{}) error {
@@ -44,7 +47,7 @@ func (*MultipartPhotoMarshaler) NewEncoder(w io.Writer) runtime.Encoder {
 }
 
 func (*MultipartPhotoMarshaler) ContentType() string {
-	return "multipart/form-data"
+	return "application/json"
 }
 
 type PhotoDecoder struct {
