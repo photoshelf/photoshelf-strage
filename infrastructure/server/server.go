@@ -21,7 +21,9 @@ func NewServer() *grpc.Server {
 
 func NewGateway(endpoint string) (*runtime.ServeMux, error) {
 	ctx := context.Background()
-	mux := runtime.NewServeMux(runtime.WithMarshalerOption("multipart/form-data", &protobuf.MultipartPhotoMarshaler{}))
+	mux := runtime.NewServeMux(
+			runtime.WithMarshalerOption("multipart/form-data; boundary=*", &protobuf.MultipartPhotoMarshaler{}),
+		)
 	opts := []grpc.DialOption{grpc.WithInsecure()}
 	if err := protobuf.RegisterPhotoServiceHandlerFromEndpoint(ctx, mux, endpoint, opts); err != nil {
 		return nil, err
