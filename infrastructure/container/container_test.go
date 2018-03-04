@@ -23,7 +23,7 @@ type testInterface interface {
 }
 
 type testInterfaceTwo interface {
-	Hoge()
+	Fuga()
 }
 
 type testImpl struct {

@@ -124,7 +124,7 @@ func TestConfigure(t *testing.T) {
 }
 
 func actualRepository() interface{} {
-	photoController := controller.NewRestPhotoController()
+	photoController := controller.NewPhotoController()
 	container.Get(photoController)
 
 	pcv := reflect.Indirect(reflect.ValueOf(photoController))
